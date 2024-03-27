@@ -21,6 +21,7 @@ import java.util.Map;
 public class UserControlller {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final UserRepositories userRepositories;
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody Map<String, Object> request) {
@@ -33,16 +34,18 @@ public class UserControlller {
         String login = (String) request.get("login");
         String email = (String) request.get("email");
         String password = (String) request.get("password");
-        int resultCode = userService.createUser(login, email, password);
+        int resultCode = userService.createUser(login, password, email);
+        System.out.println(resultCode);
         if (resultCode == 0) {
             System.out.println("User registered successfully");
-            UserModel user = new UserModel();
+            UserModel user = userRepositories.findByEmail(email);
             Map<String, Object> response = new HashMap<>();
-            user.setPassword(password);
-            user.setEmail(email);
-            user.setLogin(login);
             response.put("profile", user);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } else if (resultCode == 2) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("reason", "User with provided credentials already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } else {
             Map<String, Object> response = new HashMap<>();
             response.put("reason", "Bad Request");
