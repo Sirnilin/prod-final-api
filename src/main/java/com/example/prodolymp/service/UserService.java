@@ -66,4 +66,13 @@ public class UserService {
     private boolean isEmailValid(String email){
         return email.length() > 50;
     }
+
+    public UserModel getUserByLogin(String login){
+        return userRepositories.findByLogin(login);
+    }
+
+    public String getStoredPassword(String login){
+        UserModel user = userRepositories.findByLogin(login);
+        return user.getPassword();
+    }
 }
