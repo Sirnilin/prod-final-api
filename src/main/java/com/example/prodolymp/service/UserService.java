@@ -1,11 +1,13 @@
 package com.example.prodolymp.service;
 
 import com.example.prodolymp.models.UserModel;
+import com.example.prodolymp.models.enums.Role;
 import com.example.prodolymp.repositories.UserRepositories;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +44,7 @@ public class UserService {
         user.setEmail(email);
         user.setLogin(login);
         user.setPassword(passwordEncoder.encode(password));
+        user.getRoles().add(Role.ROLE_USER);
         userRepositories.save(user);
 
         return 0;
