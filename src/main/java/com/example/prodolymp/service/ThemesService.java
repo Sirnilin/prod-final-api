@@ -107,4 +107,8 @@ public class ThemesService {
 
         return result;
     }
+
+    public ThemesModel getThemeById(Long id){
+        return themesRepositories.findById(id).get();
+    }
 }

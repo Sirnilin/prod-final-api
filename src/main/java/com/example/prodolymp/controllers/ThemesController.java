@@ -249,7 +249,7 @@ public class ThemesController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
 
-    @Operation(summary = "Получить все темы пользователя")
+    @Operation(summary = "Получить все категории")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Все категории получены", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
@@ -265,6 +265,53 @@ public class ThemesController {
                 if(user.isPresent()){
                     List<String> categoryList = themesService.getAllCategory();
                     return ResponseEntity.status(HttpStatus.OK).body(categoryList);
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @Operation(summary = "Получить пост по айди")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пост получен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
+    @GetMapping("/getById")
+    public ResponseEntity<Object> getThemeById(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
+            @RequestHeader("Authorization") String token,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для получения поста",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(
+                                    name = "Пример запроса",
+                                    value = "{\n" +
+                                            "  \"id\": \"айди(число, а не строка)\"\n" +
+                                            "}"
+                            )
+                    )
+            )
+            @RequestBody Map<String, Object> request){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    Long id = ((Integer) request.get("id")).longValue();
+                    ThemesModel theme = themesService.getThemeById(id);
+                    if(theme != null){
+                        return ResponseEntity.status(HttpStatus.OK).body(theme);
+                    }
+                    reason.setReason("Курс с таким айди не существует");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
                 }else {
                     reason.setReason("Error when receiving the user profile");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
