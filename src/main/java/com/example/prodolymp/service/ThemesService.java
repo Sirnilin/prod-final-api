@@ -1,16 +1,20 @@
 package com.example.prodolymp.service;
 
 import com.example.prodolymp.models.ThemesModel;
+import com.example.prodolymp.models.UserModel;
 import com.example.prodolymp.repositories.ThemesRepositories;
+import com.example.prodolymp.repositories.UserRepositories;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ThemesService {
     private final ThemesRepositories themesRepositories;
+    private final UserRepositories userRepositories;
 
     public List<ThemesModel> getAllThemes(){
         return themesRepositories.findAll();
@@ -42,9 +46,47 @@ public class ThemesService {
         theme.setGraduates(0);
         theme.setPoints(points);
         theme.setStudents(0);
+        theme.setExplored(false);
 
         themesRepositories.save(theme);
 
         return theme;
+    }
+
+    public List<ThemesModel> getAllUserTheme(UserModel user){
+        List<ThemesModel> result = new ArrayList<>();
+
+        for(Long id : user.getThemeIds()){
+            ThemesModel theme = themesRepositories.findById(id).get();
+            if(user.getCompleteThemeIds().contains(id)){
+                theme.setExplored(true);
+            }else{
+                theme.setExplored(false);
+            }
+            result.add(theme);
+        }
+        return result;
+    }
+
+    public Boolean subscribeToTheme(Long id, UserModel user){
+        if(themesRepositories.findById(id).isEmpty() || user.getThemeIds().contains(id)){
+            return false;
+        }
+
+        user.getThemeIds().add(id);
+
+        userRepositories.save(user);
+        return true;
+    }
+
+    public Boolean completeTheme(Long id, UserModel user){
+        if(themesRepositories.findById(id).isEmpty() || user.getCompleteThemeIds().contains(id)){
+            return false;
+        }
+
+        user.getCompleteThemeIds().add(id);
+
+        userRepositories.save(user);
+        return true;
     }
 }

@@ -80,7 +80,7 @@ public class ThemesController {
                                             "  \"category\": \"Категория темы\",\n" +
                                             "  \"description\": \"Описание темы\",\n" +
                                             "  \"author\": \"Автор темы\",\n" +
-                                            "  \"points\": \"Количество поинтов\"\n" +
+                                            "  \"points\": \"Количество поинтовайди(число, а не строка)\"\n" +
                                             "}"
                             )
                     )
@@ -120,6 +120,128 @@ public class ThemesController {
                 }else {
                     reason.setReason("Invalid date body");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @Operation(summary = "Получить все темы пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Посты получены", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
+    @GetMapping("/me")
+    public ResponseEntity<Object> getAllUserThemes(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
+            @RequestHeader("Authorization") String token){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    List<ThemesModel> themesList = themesService.getAllUserTheme(user.get());
+                    return ResponseEntity.status(HttpStatus.OK).body(themesList);
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @Operation(summary = "Подписка на курс по айди")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно подписан на курс", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
+    @PostMapping("/add")
+    public ResponseEntity<Object> subscribeToTheme(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
+            @RequestHeader("Authorization") String token,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для подписки на пост",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(
+                                    name = "Пример запроса",
+                                    value = "{\n" +
+                                            "  \"id\": \"айди(число, а не строка)\",\n" +
+                                            "}"
+                            )
+                    )
+            )
+            @RequestBody Map<String, Object> request){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    Long id = ((Integer) request.get("id")).longValue();
+                    if(themesService.subscribeToTheme(id, user.get())){
+                        UserModel currentUser = user.get();
+                        currentUser.setPassword(null);
+                        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
+                    }
+                    reason.setReason("Вы уже подписаны на этот курс, или такого курса не существует!");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @Operation(summary = "Курс пройден")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно прошел курс", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
+    @PostMapping("/complete")
+    public ResponseEntity<Object> completeTheme(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
+            @RequestHeader("Authorization") String token,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для прохождения курса",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(
+                                    name = "Пример запроса",
+                                    value = "{\n" +
+                                            "  \"id\": \"айди(число, а не строка)\",\n" +
+                                            "}"
+                            )
+                    )
+            )
+            @RequestBody Map<String, Object> request){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    Long id = ((Integer) request.get("id")).longValue();
+                    if(themesService.completeTheme(id, user.get())){
+                        UserModel currentUser = user.get();
+                        currentUser.setPassword(null);
+                        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
+                    }
+                    reason.setReason("Вы уже прошли этот курс, или такого курса не существует!");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
                 }
             }
         }
