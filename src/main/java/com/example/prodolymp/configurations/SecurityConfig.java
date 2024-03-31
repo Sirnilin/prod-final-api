@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import tech.ailef.snapadmin.external.SnapAdminProperties;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,23 +23,14 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*@Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
-    }*/
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         String baseUrl = properties.getBaseUrl();
-        http.csrf().disable()
-                .authorizeRequests((requests) -> requests
+        http.authorizeRequests((requests) -> requests
                         .requestMatchers("/api.html").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/swagger-ui/index.html").permitAll()
-                        .requestMatchers(baseUrl).hasAnyRole("ROLE_ADMIN")
+                        .requestMatchers("/admin").hasAnyRole("ROLE_ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin((form) -> form
@@ -49,8 +39,7 @@ public class SecurityConfig {
                         .permitAll()
                         .failureHandler(authenticationFailureHandler())
                 )
-                .logout(LogoutConfigurer::permitAll)
-        ;
+                .logout(LogoutConfigurer::permitAll);
 
         return http.build();
     }
@@ -62,20 +51,5 @@ public class SecurityConfig {
             response.sendRedirect("/login?error=true");
         };
     }
-
-    /*@Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (request, response, authException) -> response.sendRedirect("/login");
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserModel user = new UserModel();
-        user.setLogin("user");
-        user.setEmail("user@example.com");
-        user.setPassword(passwordEncoder().encode("password"));
-        user.setRoles(Collections.singleton(Role.ROLE_USER));
-
-        return new InMemoryUserDetailsManager(user);
-    }*/
 }
+
