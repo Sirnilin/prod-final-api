@@ -25,7 +25,7 @@ public class ThemesModel {
     @Schema(description = "Категория курса. Максимальная длина - 50 символов.")
     private String category;
 
-    @Column(name = "description", length = 50)
+    @Column(name = "description", length = 300)
     @Schema(description = "Описание курса. Максимальная длина - 300 символов.")
     private String description;
 

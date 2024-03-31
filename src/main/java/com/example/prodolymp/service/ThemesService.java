@@ -22,6 +22,10 @@ public class ThemesService {
     }
 
     public ThemesModel createTheme(String title, String category, String description, String author, Integer points){
+        System.out.println(title.length());
+        System.out.println(category.length());
+        System.out.println(description.length());
+        System.out.println(author.length());
         if(title.length() > 50){
             return null;
         }
