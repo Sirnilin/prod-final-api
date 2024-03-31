@@ -171,7 +171,7 @@ public class ThemesController {
                             examples = @ExampleObject(
                                     name = "Пример запроса",
                                     value = "{\n" +
-                                            "  \"id\": \"айди(число, а не строка)\",\n" +
+                                            "  \"id\": \"айди(число, а не строка)\"\n" +
                                             "}"
                             )
                     )
@@ -219,7 +219,7 @@ public class ThemesController {
                             examples = @ExampleObject(
                                     name = "Пример запроса",
                                     value = "{\n" +
-                                            "  \"id\": \"айди(число, а не строка)\",\n" +
+                                            "  \"id\": \"айди(число, а не строка)\"\n" +
                                             "}"
                             )
                     )
