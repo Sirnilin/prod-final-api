@@ -22,6 +22,7 @@ public class PingController {
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @CrossOrigin
     public String ping() {
         return "ok";
     }
