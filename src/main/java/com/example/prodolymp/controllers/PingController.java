@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 @RestController
 @RequestMapping("/api/ping")
+@CrossOrigin(origins = "*")
 public class PingController {
 
     @Operation(summary = "Просто пинг", description = "Проверка на работоспособность сервера")
