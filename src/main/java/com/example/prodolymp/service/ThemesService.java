@@ -6,6 +6,7 @@ import com.example.prodolymp.repositories.ThemesRepositories;
 import com.example.prodolymp.repositories.UserRepositories;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.context.Theme;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,5 +89,18 @@ public class ThemesService {
 
         userRepositories.save(user);
         return true;
+    }
+
+    public List<String> getAllCategory(){
+        List<String> result = new ArrayList<>();
+        List<ThemesModel> themes = themesRepositories.findAll();
+
+        for(ThemesModel theme: themes){
+            if(!result.contains(theme.getCategory())){
+                result.add(theme.getCategory());
+            }
+        }
+
+        return result;
     }
 }
