@@ -19,7 +19,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepositories userRepositories;
 
-    public int createUser(String login, String password, String email){
+    public int createUser(String login, String password, String email,Boolean admin){
         if(login == null || password == null || email == null){
             return 1;
         }
@@ -44,7 +44,12 @@ public class UserService {
         user.setEmail(email);
         user.setLogin(login);
         user.setPassword(passwordEncoder.encode(password));
-        user.getRoles().add(Role.ROLE_USER);
+
+        if(admin){
+            user.getRoles().add(Role.ROLE_ADMIN);
+        }else{
+            user.getRoles().add(Role.ROLE_USER);
+        }
         userRepositories.save(user);
 
         return 0;

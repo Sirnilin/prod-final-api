@@ -43,7 +43,7 @@ public class UserControlller {
                     description = "Данные пользователя для регистрации",
                     required = true,
                     content = @Content(schema = @Schema(implementation = Map.class), examples = {
-                            @ExampleObject(name = "example_request", value = "{\"login\": \"example_login\", \"email\": \"example@example.com\", \"password\": \"example_password\"}")
+                            @ExampleObject(name = "example_request", value = "{\"login\": \"example_login\", \"email\": \"example@example.com\", \"password\": \"example_password\", \"admin\": \"false\"}")
                     })
             )
             @RequestBody Map<String, Object> request) {
@@ -56,7 +56,8 @@ public class UserControlller {
         String login = (String) request.get("login");
         String email = (String) request.get("email");
         String password = (String) request.get("password");
-        int resultCode = userService.createUser(login, password, email);
+        Boolean admin = (Boolean) request.get("admin");
+        int resultCode = userService.createUser(login, password, email, admin);
         System.out.println(resultCode);
         if (resultCode == 0) {
             System.out.println("User registered successfully");
