@@ -18,10 +18,6 @@ jobs:
         username: root
         key: ${{ secrets.SSH_KEY }}
         script: |
-          cd Backend
-          git pull
-          mvn clean package
-          screen -X -S prod quit
-          reboot now
+          sh reboot.sh
           
           
