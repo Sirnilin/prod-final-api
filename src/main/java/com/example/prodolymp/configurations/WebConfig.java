@@ -22,4 +22,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResolver(new PathResourceResolver());
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+    }
+
 }
