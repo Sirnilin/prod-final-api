@@ -251,7 +251,7 @@ public class ThemesController {
 
     @Operation(summary = "Получить все категории")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Все категории получены", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "200", description = "Все категории получены", content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
     @GetMapping("/category")
     public ResponseEntity<Object> getAllCategory(

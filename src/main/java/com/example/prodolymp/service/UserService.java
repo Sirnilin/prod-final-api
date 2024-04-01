@@ -20,7 +20,7 @@ public class UserService {
     private final UserRepositories userRepositories;
 
     public int createUser(String phone, String password, String firstname, String surname, String lastname, Boolean admin){
-        if(phone == null || password == null || firstname == null || surname == null || lastname == null){
+        if(phone == null || password == null || firstname == null){
             return 1;
         }
 
@@ -75,5 +75,22 @@ public class UserService {
     public String getStoredPassword(String phone){
         UserModel user = userRepositories.findByPhone(phone);
         return user.getPassword();
+    }
+
+    public UserModel updateUserInfo(String firstname, String surname, String lastname, UserModel user){
+        if(firstname != null){
+            user.setFirstname(firstname);
+        }
+
+        if(surname != null){
+            user.setSurname(surname);
+        }
+
+        if(lastname != null){
+            user.setLastname(lastname);
+        }
+
+        userRepositories.save(user);
+        return user;
     }
 }
