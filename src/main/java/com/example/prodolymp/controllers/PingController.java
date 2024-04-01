@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/ping")
-@CrossOrigin(origins = {"http://127.0.0.1:8000/", "https://dnevnik.fun/"})
+@CrossOrigin(origins = "*")
 public class PingController {
 
     @Operation(summary = "Просто пинг", description = "Проверка на работоспособность сервера")
