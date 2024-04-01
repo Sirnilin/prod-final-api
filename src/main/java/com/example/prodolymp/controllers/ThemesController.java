@@ -235,32 +235,6 @@ public class ThemesController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
 
-    @Operation(summary = "Получить все категории")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Все категории получены", content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))),
-            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
-    @GetMapping("/category")
-    public ResponseEntity<Object> getAllCategory(
-            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
-            @RequestHeader("Authorization") String token){
-        ReasonModel reason = new ReasonModel();
-        if(token != null && token.startsWith("Bearer ")){
-            String jwtToken = token.substring(7);
-            if(tokenService.validateToken(jwtToken)){
-                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
-                if(user.isPresent()){
-                    List<String> categoryList = themesService.getAllCategory();
-                    return ResponseEntity.status(HttpStatus.OK).body(categoryList);
-                }else {
-                    reason.setReason("Error when receiving the user profile");
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
-                }
-            }
-        }
-        reason.setReason("Invalid token");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
-    }
-
     @Operation(summary = "Получить пост по айди")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Пост получен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
