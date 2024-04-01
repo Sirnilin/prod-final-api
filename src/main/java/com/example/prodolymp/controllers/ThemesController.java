@@ -328,7 +328,24 @@ public class ThemesController {
             @ApiResponse(responseCode = "403", description = "Аккаунт пользователя не является админом", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))) })
     @PostMapping("/createTask")
     public ResponseEntity<Object> createTask(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для получения поста",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(
+                                    name = "Пример запроса",
+                                    value = "{\n" +
+                                            "  \"id\": \"айди темы к которой добавить\",\n" +
+                                            "  \"response\": \"ответ на задачу\",\n" +
+                                            "  \"description\": \"Описание задачи\",\n" +
+                                            "}"
+                            )
+                    )
+            )
             @RequestBody Map<String, Object> request){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
@@ -377,7 +394,9 @@ public class ThemesController {
     @PostMapping("addImageUnderTheme/{underThemeId}")
     public ResponseEntity<Object> addImageUnderTheme(
             @RequestHeader("Authorization") String token,
+            @Parameter(description = "Файл изображения", required = true, schema = @Schema(type = "string", format = "binary"))
             @RequestParam("file") MultipartFile file,
+            @Parameter(description = "ID подтемы", required = true, example = "123", schema = @Schema(type = "integer"))
             @PathVariable Long underThemeId){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
@@ -406,11 +425,13 @@ public class ThemesController {
         reason.setReason("Invalid token");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
-
+    @Operation(summary = "Добавить фото для задачки подзадачи")
     @PostMapping("addImageTask/{taskId}")
     public ResponseEntity<Object> addImageTask(
             @RequestHeader("Authorization") String token,
+            @Parameter(description = "Файл изображения", required = true, schema = @Schema(type = "string", format = "binary"))
             @RequestParam("file") MultipartFile file,
+            @Parameter(description = "ID задачи", required = true, example = "123", schema = @Schema(type = "integer"))
             @PathVariable Long taskId){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
