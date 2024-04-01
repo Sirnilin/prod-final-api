@@ -206,33 +206,19 @@ public class ThemesController {
             @ApiResponse(responseCode = "200", description = "Пользователь успешно прошел курс", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
             @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
-    @PostMapping("/complete")
+    @PostMapping("/complete/{themeId}")
     public ResponseEntity<Object> completeTheme(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Данные для прохождения курса",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Map.class),
-                            examples = @ExampleObject(
-                                    name = "Пример запроса",
-                                    value = "{\n" +
-                                            "  \"id\": \"айди(число, а не строка)\"\n" +
-                                            "}"
-                            )
-                    )
-            )
-            @RequestBody Map<String, Object> request){
+            @Parameter(description = "Айди темы, которую прошел пользователь", required = true, example = "43", schema = @Schema(type = "43"))
+            @PathVariable Long themeId){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
             String jwtToken = token.substring(7);
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    Long id = ((Integer) request.get("id")).longValue();
-                    if(themesService.completeTheme(id, user.get())){
+                    if(themesService.completeTheme(themeId, user.get())){
                         UserModel currentUser = user.get();
                         currentUser.setPassword(null);
                         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
@@ -280,32 +266,18 @@ public class ThemesController {
             @ApiResponse(responseCode = "200", description = "Пост получен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
             @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
-    @GetMapping("/getById")
+    @GetMapping("/getBy/{id}")
     public ResponseEntity<Object> getThemeById(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Данные для получения поста",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Map.class),
-                            examples = @ExampleObject(
-                                    name = "Пример запроса",
-                                    value = "{\n" +
-                                            "  \"id\": \"айди(число, а не строка)\"\n" +
-                                            "}"
-                            )
-                    )
-            )
-            @RequestBody Map<String, Object> request){
+            @Parameter(description = "Айди темы, которую нужно получить", required = true, example = "43", schema = @Schema(type = "integer"))
+            @PathVariable Long id){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
             String jwtToken = token.substring(7);
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    Long id = ((Integer) request.get("id")).longValue();
                     ThemesModel theme = themesService.getThemeById(id);
                     if(theme != null){
                         return ResponseEntity.status(HttpStatus.OK).body(theme);
@@ -331,7 +303,6 @@ public class ThemesController {
     public ResponseEntity<Object> createUnderTheme(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
-            @Parameter(description = "Файл изображения подтемы", required = true)
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для получения поста",
                     required = true,
@@ -342,6 +313,7 @@ public class ThemesController {
                                     name = "Пример запроса",
                                     value = "{\n" +
                                             "  \"title\": \"Название подтемы\",\n" +
+                                            "  \"id\": \"айди темы к которой добавить\",\n" +
                                             "  \"video_url\": \"Ссылка на видео\",\n" +
                                             "  \"description\": \"Описание темы\",\n" +
                                             "  \"points\": \"Количество поинтовайди(число, а не строка)\"\n" +
@@ -349,7 +321,6 @@ public class ThemesController {
                             )
                     )
             )
-            @RequestPart("file") MultipartFile file,
             @RequestBody Map<String, Object> request){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
@@ -358,23 +329,21 @@ public class ThemesController {
                 if(request != null){
                     Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                     if(user.isPresent()){
-                        if(user.get().getRole() == Role.ROLE_USER){
+                        if(user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)){
                             Long id = ((Integer) request.get("id")).longValue();
                             String title = (String) request.get("title");
                             String url = (String) request.get("video_url");
                             String description = (String) request.get("description");
                             Integer points = (Integer) request.get("points");
 
-                            String image = imageService.saveImage(file);
-
-                            UnderThemesModel under = themesService.createUnderThemes(id, title, description, url, image, points);
+                            UnderThemesModel under = themesService.createUnderThemes(id, title, description, url, points);
 
                             if(under == null){
                                 reason.setReason("Bad request");
                                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
                             }
 
-                            return ResponseEntity.status(HttpStatus.OK).body(image);
+                            return ResponseEntity.status(HttpStatus.OK).body(under);
                         }else{
                             reason.setReason("The user is not an administrator");
                             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(reason);
@@ -392,11 +361,15 @@ public class ThemesController {
         reason.setReason("Invalid token");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
-
+    @Operation(summary = "Создать таску для подтемы")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "таска создана", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UnderThemesModel.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "403", description = "Аккаунт пользователя не является админом", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))) })
     @PostMapping("/createTask")
     public ResponseEntity<Object> createTask(
             @RequestHeader("Authorization") String token,
-            @RequestPart("file") MultipartFile file,
             @RequestBody Map<String, Object> request){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
@@ -405,13 +378,13 @@ public class ThemesController {
                 if(request != null){
                     Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                     if(user.isPresent()){
-                        if(user.get().getRole() == Role.ROLE_USER){
+                        if(user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)){
                             Long id = ((Integer) request.get("id")).longValue();
                             String response = (String) request.get("response");
                             String description = (String) request.get("description");
-                            String image = imageService.saveImage(file);
 
-                            TaskModel task = themesService.createTask(description, response, image, id);
+
+                            TaskModel task = themesService.createTask(description, response, id);
 
                             if(task == null){
                                 reason.setReason("Bad request");
@@ -430,6 +403,72 @@ public class ThemesController {
                 }else {
                     reason.setReason("Invalid date body");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @PostMapping("addImageUnderTheme/{underThemeId}")
+    public ResponseEntity<Object> addImageUnderTheme(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("file") MultipartFile file,
+            @PathVariable Long underThemeId){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    if(user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)){
+                        String image = imageService.saveImage(file);
+                        UnderThemesModel under = themesService.addImageUnderTheme(image, underThemeId);
+                        if(under != null){
+                            return ResponseEntity.status(HttpStatus.OK).body(under);
+                        }
+                        reason.setReason("Такой подтемы не существует");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                    }else{
+                        reason.setReason("The user is not an administrator");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(reason);
+                    }
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @PostMapping("addImageTask/{taskId}")
+    public ResponseEntity<Object> addImageTask(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("file") MultipartFile file,
+            @PathVariable Long taskId){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    if(user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)){
+                        String image = imageService.saveImage(file);
+                        TaskModel task = themesService.addImageTask(image, taskId);
+                        if(task != null){
+                            return ResponseEntity.status(HttpStatus.OK).body(task);
+                        }
+                        reason.setReason("Такой таски не существует");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                    }else{
+                        reason.setReason("The user is not an administrator");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(reason);
+                    }
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
                 }
             }
         }

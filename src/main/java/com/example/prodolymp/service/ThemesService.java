@@ -115,7 +115,7 @@ public class ThemesService {
         return themesRepositories.findById(id).get();
     }
 
-    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, String image, Integer points){
+    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, Integer points){
         ThemesModel theme = themesRepositories.findById(id).get();
 
         if(theme == null){
@@ -141,7 +141,6 @@ public class ThemesService {
         under.setDescription(description);
         under.setTitle(title);
         under.setVideoUrl(url);
-        under.setImage(image);
         under.setPoints(points);
 
         theme.getUnderThemeIds().add(under.getId());
@@ -152,7 +151,7 @@ public class ThemesService {
         return under;
     }
 
-    public TaskModel createTask(String description, String response, String image, Long id){
+    public TaskModel createTask(String description, String response, Long id){
         UnderThemesModel under = underThemesRepositories.findById(id).get();
 
         if(under == null){
@@ -167,13 +166,8 @@ public class ThemesService {
             return null;
         }
 
-        if(image.length() > 1000){
-            return null;
-        }
-
         TaskModel task = new TaskModel();
 
-        task.setImage(image);
         task.setExplored(false);
         task.setResponse(response);
         task.setDescription(description);
@@ -185,4 +179,31 @@ public class ThemesService {
 
         return task;
     }
+
+    public UnderThemesModel addImageUnderTheme(String image, Long id){
+        UnderThemesModel under = underThemesRepositories.findById(id).get();
+
+        if(under == null){
+            return under;
+        }
+
+        under.setImage(image);
+
+        underThemesRepositories.save(under);
+
+        return under;
+    }
+
+    public TaskModel addImageTask(String image, Long id) {
+        TaskModel task = taskRepositories.findById(id).get();
+
+        if (task == null) {
+            return task;
+        }
+
+        task.setImage(image);
+
+        return task;
+    }
 }
+
