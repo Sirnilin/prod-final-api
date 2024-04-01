@@ -1,8 +1,12 @@
 package com.example.prodolymp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
+
+import jakarta.persistence.*;
+
 
 @Data
 @Entity

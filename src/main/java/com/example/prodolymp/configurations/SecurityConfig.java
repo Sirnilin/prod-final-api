@@ -3,14 +3,22 @@ package com.example.prodolymp.configurations;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import tech.ailef.snapadmin.external.SnapAdminProperties;
+
+import java.util.List;
 
 
 @Configuration
@@ -34,13 +42,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String baseUrl = properties.getBaseUrl();
+        /*String baseUrl = properties.getBaseUrl();
         http.csrf().disable()
                 .authorizeRequests((requests) -> requests
-                        .requestMatchers("/api.html").permitAll()
-                        .requestMatchers("/api/**").permitAll()
-                        .requestMatchers("/swagger-ui/index.html").permitAll()
-                        .requestMatchers(baseUrl).hasAnyRole("ROLE_ADMIN")
+
+                        .mvcMatchers("/api.html").permitAll()
+                        .mvcMatchers("/api/**").permitAll()
+                        .mvcMatchers("/swagger-ui/index.html").permitAll()
+                        .mvcMatchers(baseUrl).hasAnyRole("ROLE_ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin((form) -> form
@@ -52,8 +61,19 @@ public class SecurityConfig {
                 .logout(LogoutConfigurer::permitAll)
         ;
 
-        return http.build();
+        return http.build();*/
+
+        return http
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/admin").authenticated()
+                        .anyRequest().permitAll())
+                .build();
     }
+
+
 
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
@@ -61,6 +81,20 @@ public class SecurityConfig {
             System.out.println("Login failed with: " + exception.getMessage());
             response.sendRedirect("/login?error=true");
         };
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        List<String> corsAllList = List.of(CorsConfiguration.ALL);
+        var corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOriginPatterns(corsAllList);
+        corsConfiguration.setAllowedMethods(corsAllList);
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedHeaders(corsAllList);
+        corsConfiguration.setExposedHeaders(corsAllList);
+        var corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return corsConfigurationSource;
     }
 
     /*@Bean

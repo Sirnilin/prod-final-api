@@ -1,30 +1,34 @@
 package com.example.prodolymp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ImageService {
 
-    public String saveImage(MultipartFile file){
-        try{
-            String fileName = UUID.randomUUID().toString() + "." + getFileExtension(file.getOriginalFilename());
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
-            String uploadDir = "src/main/resources/static/images/";
-            File destFile = new File(uploadDir + File.separator + fileName);
-            file.transferTo(destFile);
+    public String saveImage(MultipartFile file){
+        try {
+            String fileName = UUID.randomUUID().toString() + "." + getFileExtension(file.getOriginalFilename());
+            Path filePath = Paths.get(uploadDir, fileName);
+            Files.copy(file.getInputStream(), filePath);
 
             String imageUrl = "https://api.prod.webtm.ru/" + fileName;
-
             return imageUrl;
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }

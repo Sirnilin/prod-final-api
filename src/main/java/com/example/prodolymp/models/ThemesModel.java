@@ -50,7 +50,7 @@ public class ThemesModel {
     private Integer graduates;
 
     @ElementCollection
-    @CollectionTable(name = "themes_underTemes", joinColumns = @JoinColumn(name = "themes_id"))
-    @Column(name = "underThemes_id")
+    @CollectionTable(name = "themes_under_themes", joinColumns = @JoinColumn(name = "themes_id"))
+    @Column(name = "under_themes_id")
     private Set<Long> underThemeIds = new HashSet<>();
 }

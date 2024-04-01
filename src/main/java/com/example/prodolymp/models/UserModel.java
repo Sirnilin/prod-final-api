@@ -4,15 +4,12 @@ import com.example.prodolymp.models.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import jakarta.validation.constraints.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import lombok.Data;
+
+
+import jakarta.persistence.*;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Data

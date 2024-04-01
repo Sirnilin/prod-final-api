@@ -115,7 +115,7 @@ public class ThemesService {
         return themesRepositories.findById(id).get();
     }
 
-    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, String image){
+    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, String image, Integer points){
         ThemesModel theme = themesRepositories.findById(id).get();
 
         if(theme == null){
@@ -142,6 +142,7 @@ public class ThemesService {
         under.setTitle(title);
         under.setVideoUrl(url);
         under.setImage(image);
+        under.setPoints(points);
 
         theme.getUnderThemeIds().add(under.getId());
 

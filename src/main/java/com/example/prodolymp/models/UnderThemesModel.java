@@ -47,12 +47,12 @@ public class UnderThemesModel {
     private Integer points;
 
     @ElementCollection
-    @CollectionTable(name = "underTemes_tasks", joinColumns = @JoinColumn(name = "underThemes_id"))
+    @CollectionTable(name = "under_themes_tasks", joinColumns = @JoinColumn(name = "under_themes_id"))
     @Column(name = "tasks_id")
     private Set<Long> tasksIds = new HashSet<>();
 
     @ElementCollection
-    @CollectionTable(name = "underTemes_lesson", joinColumns = @JoinColumn(name = "underThemes_id"))
+    @CollectionTable(name = "under_themes_lesson", joinColumns = @JoinColumn(name = "under_themes_id"))
     @Column(name = "lesson_id")
     private Set<Long> lessonIds = new HashSet<>();
 
