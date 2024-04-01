@@ -158,32 +158,17 @@ public class ThemesController {
             @ApiResponse(responseCode = "200", description = "Пользователь успешно подписан на курс", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
             @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
-    @PostMapping("/add")
+    @PostMapping("/add/{id}")
     public ResponseEntity<Object> subscribeToTheme(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Данные для подписки на пост",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Map.class),
-                            examples = @ExampleObject(
-                                    name = "Пример запроса",
-                                    value = "{\n" +
-                                            "  \"id\": \"айди(число, а не строка)\"\n" +
-                                            "}"
-                            )
-                    )
-            )
-            @RequestBody Map<String, Object> request){
+            @PathVariable Long id){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
             String jwtToken = token.substring(7);
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    Long id = ((Integer) request.get("id")).longValue();
                     if(themesService.subscribeToTheme(id, user.get())){
                         UserModel currentUser = user.get();
                         currentUser.setPassword(null);
@@ -383,7 +368,12 @@ public class ThemesController {
         reason.setReason("Invalid token");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
-
+    @Operation(summary = "Добавить фото для подзадачи")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "фото добавлено(возвращается ссылка на фотку)", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "403", description = "Аккаунт пользователя не является админом", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))) })
     @PostMapping("addImageUnderTheme/{underThemeId}")
     public ResponseEntity<Object> addImageUnderTheme(
             @RequestHeader("Authorization") String token,
