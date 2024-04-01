@@ -15,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +23,7 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class CategoryController {
     private final CategoryService categoryService;
     private final TokenService tokenService;
@@ -55,6 +53,7 @@ public class CategoryController {
         reason.setReason("Invalid token");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
+
     @PostMapping("/addCategory")
     public ResponseEntity<Object> addNewCategory(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
