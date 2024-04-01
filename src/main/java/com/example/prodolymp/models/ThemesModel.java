@@ -33,6 +33,10 @@ public class ThemesModel {
     @Schema(description = "Пройдена или не пройдена задача.")
     private Boolean explored;
 
+    @Column(name = "started")
+    @Schema(description = "Поступил или не поступил")
+    private Boolean started;
+
     @Column(name = "author", length = 50)
     @Schema(description = "Автор курса. Максимальня длина 50 символов.")
     private String author;

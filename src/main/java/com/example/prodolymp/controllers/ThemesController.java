@@ -46,7 +46,7 @@ public class ThemesController {
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    List<ThemesModel> themesList = themesService.getAllThemes();
+                    List<ThemesModel> themesList = themesService.getAllThemes(user.get());
                     return ResponseEntity.status(HttpStatus.OK).body(themesList);
                 }else {
                     reason.setReason("Error when receiving the user profile");

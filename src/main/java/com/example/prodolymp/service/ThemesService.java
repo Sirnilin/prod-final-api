@@ -20,8 +20,19 @@ public class ThemesService {
     private final TaskRepositories taskRepositories;
     private final UserRepositories userRepositories;
 
-    public List<ThemesModel> getAllThemes(){
-        return themesRepositories.findAll();
+    public List<ThemesModel> getAllThemes(UserModel user){
+        List<ThemesModel> themesModelList = themesRepositories.findAll();
+        List<ThemesModel> result = new ArrayList<>();
+        for(ThemesModel theme : themesModelList){
+            if(user.getCompleteThemeIds().contains(theme.getId())){
+                theme.setStarted(true);
+            }else{
+                theme.setStarted(false);
+            }
+            result.add(theme);
+        }
+
+        return result;
     }
 
     public ThemesModel createTheme(String title, String category, String description, String author, Integer points){
@@ -66,10 +77,16 @@ public class ThemesService {
 
         for(Long id : user.getThemeIds()){
             ThemesModel theme = themesRepositories.findById(id).get();
+            theme.setStarted(true);
             if(user.getCompleteThemeIds().contains(id)){
                 theme.setExplored(true);
             }else{
                 theme.setExplored(false);
+            }
+            if(user.getCompleteThemeIds().contains(theme.getId())){
+                theme.setStarted(true);
+            }else{
+                theme.setStarted(false);
             }
             result.add(theme);
         }
@@ -96,19 +113,6 @@ public class ThemesService {
 
         userRepositories.save(user);
         return true;
-    }
-
-    public List<String> getAllCategory(){
-        List<String> result = new ArrayList<>();
-        List<ThemesModel> themes = themesRepositories.findAll();
-
-        for(ThemesModel theme: themes){
-            if(!result.contains(theme.getCategory())){
-                result.add(theme.getCategory());
-            }
-        }
-
-        return result;
     }
 
     public ThemesModel getThemeById(Long id){
