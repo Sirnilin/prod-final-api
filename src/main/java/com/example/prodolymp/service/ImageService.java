@@ -25,7 +25,7 @@ public class ImageService {
             Path filePath = Paths.get(uploadDir, fileName);
             Files.copy(file.getInputStream(), filePath);
 
-            String imageUrl = "https://api.prod.webtm.ru/images" + fileName;
+            String imageUrl = "http://82.97.241.151:8081/images" + fileName;
             return imageUrl;
         } catch (IOException e) {
             e.printStackTrace();
