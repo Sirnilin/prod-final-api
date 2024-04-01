@@ -94,8 +94,7 @@ public class ThemesController {
                 if(request != null){
                     Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                     if(user.isPresent()){
-                        System.out.println(user.get().getRoles());
-                        if(user.get().getRoles().contains(Role.ROLE_ADMIN)){
+                        if(user.get().getRole() == Role.ROLE_USER){
                             String title = (String) request.get("title");
                             String category = (String) request.get("category");
                             String description = (String) request.get("description");
@@ -359,8 +358,7 @@ public class ThemesController {
                 if(request != null){
                     Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                     if(user.isPresent()){
-                        System.out.println(user.get().getRoles());
-                        if(user.get().getRoles().contains(Role.ROLE_ADMIN)){
+                        if(user.get().getRole() == Role.ROLE_USER){
                             Long id = ((Integer) request.get("id")).longValue();
                             String title = (String) request.get("title");
                             String url = (String) request.get("video_url");
@@ -407,8 +405,7 @@ public class ThemesController {
                 if(request != null){
                     Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                     if(user.isPresent()){
-                        System.out.println(user.get().getRoles());
-                        if(user.get().getRoles().contains(Role.ROLE_ADMIN)){
+                        if(user.get().getRole() == Role.ROLE_USER){
                             Long id = ((Integer) request.get("id")).longValue();
                             String response = (String) request.get("response");
                             String description = (String) request.get("description");

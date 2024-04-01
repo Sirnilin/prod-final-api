@@ -41,7 +41,7 @@ public class UserControlller {
                     description = "Данные пользователя для регистрации",
                     required = true,
                     content = @Content(schema = @Schema(implementation = Map.class), examples = {
-                            @ExampleObject(name = "example_request", value = "{\"login\": \"example_login\", \"email\": \"example@example.com\", \"password\": \"example_password\", \"admin\": \"false\"}")
+                            @ExampleObject(name = "example_request", value = "{\"phone\": \"+78888888888\", \"firstname\": \"example_firstname\", \"surname\": \"example_surname\", \"lastname\": \"example_lastname\", \"password\": \"example_password\", \"admin\": \"false(bool, не строка)\"}")
                     })
             )
             @RequestBody Map<String, Object> request) {
@@ -51,15 +51,17 @@ public class UserControlller {
             return ResponseEntity.status(HttpStatus.CREATED).body(reason);
         }
         System.out.println(request);
-        String login = (String) request.get("login");
-        String email = (String) request.get("email");
+        String phone = (String) request.get("phone");
+        String firstname = (String) request.get("firstname");
+        String surname = (String) request.get("surname");
+        String lastname = (String) request.get("lastname");
         String password = (String) request.get("password");
         Boolean admin = (Boolean) request.get("admin");
-        int resultCode = userService.createUser(login, password, email, admin);
+        int resultCode = userService.createUser(phone,password, firstname, surname, lastname, admin);
         System.out.println(resultCode);
         if (resultCode == 0) {
             System.out.println("User registered successfully");
-            UserModel user = userService.getUserByLogin(login);
+            UserModel user = userService.getUserByPhone(phone);
             user.setPassword(null);
             Map<String, Object> response = new HashMap<>();
             response.put("profile", user);
@@ -86,7 +88,7 @@ public class UserControlller {
             description = "Данные пользователя для регистрации",
             required = true,
             content = @Content(schema = @Schema(implementation = Map.class), examples = {
-                    @ExampleObject(name = "example_request", value = "{\"login\": \"example_login\", \"password\": \"example_password\"}")
+                    @ExampleObject(name = "example_request", value = "{\"phone\": \"+788888888888\", \"password\": \"example_password\"}")
             })
     )
             @RequestBody Map<String, Object> request){
@@ -95,14 +97,14 @@ public class UserControlller {
             reason.setReason("Request body is missing");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
         }
-        String login = (String) request.get("login");
+        String phone = (String) request.get("phone");
         String password = (String) request.get("password");
-        UserModel user = userService.getUserByLogin(login);
+        UserModel user = userService.getUserByPhone(phone);
         if(user == null){
             reason.setReason("Invalid login or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
         }
-        String storedPassword = userService.getStoredPassword(login);
+        String storedPassword = userService.getStoredPassword(phone);
 
         if(!passwordEncoder.matches(password, storedPassword)){
             reason.setReason("Invalid login or password");

@@ -19,12 +19,12 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepositories userRepositories;
 
-    public int createUser(String login, String password, String email,Boolean admin){
-        if(login == null || password == null || email == null){
+    public int createUser(String phone, String password, String firstname, String surname, String lastname, Boolean admin){
+        if(phone == null || password == null || firstname == null || surname == null || lastname == null){
             return 1;
         }
 
-        if(!isUnique(email, login)){
+        if(!isUnique(phone)){
             return 2;
         }
 
@@ -32,31 +32,30 @@ public class UserService {
             return 1;
         }
 
-        if(!isLoginValid(login)){
-            return 1;
-        }
-
-        if(isEmailValid(email)){
+        if(!isPhoneValid(phone)){
             return 1;
         }
 
         UserModel user = new UserModel();
-        user.setEmail(email);
-        user.setLogin(login);
+        user.setPhone(phone);
+        user.setFirstname(firstname);
+        user.setLastname(lastname);
+        user.setSurname(surname);
+        user.setPoints(0);
         user.setPassword(passwordEncoder.encode(password));
 
         if(admin){
-            user.getRoles().add(Role.ROLE_ADMIN);
+            user.setRole(Role.ROLE_ADMIN);
         }else{
-            user.getRoles().add(Role.ROLE_USER);
+            user.setRole(Role.ROLE_USER);
         }
         userRepositories.save(user);
 
         return 0;
     }
 
-    private Boolean isUnique(String email, String login){
-        return userRepositories.findByEmail(email) == null && userRepositories.findByLogin(login) == null;
+    private Boolean isUnique(String phone){
+        return userRepositories.findByPhone(phone) == null;
     }
 
     private boolean isPasswordValid(String password) {
@@ -65,22 +64,16 @@ public class UserService {
         return passwordMatcher.matches();
     }
 
-    private boolean isLoginValid(String login) {
-        Pattern loginPattern = Pattern.compile("[a-zA-Z0-9-]+");
-        Matcher loginMatcher = loginPattern.matcher(login);
-        return loginMatcher.matches();
+    private boolean isPhoneValid(String phone) {
+        return phone.matches("\\+\\d+") && phone.length() <= 20;
     }
 
-    private boolean isEmailValid(String email){
-        return email.length() > 50;
+    public UserModel getUserByPhone(String phone){
+        return userRepositories.findByPhone(phone);
     }
 
-    public UserModel getUserByLogin(String login){
-        return userRepositories.findByLogin(login);
-    }
-
-    public String getStoredPassword(String login){
-        UserModel user = userRepositories.findByLogin(login);
+    public String getStoredPassword(String phone){
+        UserModel user = userRepositories.findByPhone(phone);
         return user.getPassword();
     }
 }

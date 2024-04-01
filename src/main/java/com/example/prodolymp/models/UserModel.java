@@ -22,23 +22,32 @@ public class UserModel {
     @JsonIgnore
     private Long id;
 
-    @Column(name = "login", unique = true)
-    @Schema(description = "Логин пользователя. Должен состоять из букв латинского алфавита (в верхнем или нижнем регистре), цифр и дефиса. Длина от 3 до 20 символов.")
-    private String login;
+    @Column(name = "phne", unique = true)
+    @Schema(description = "Номер телефона пользователя. Должен начинаться на знак + и состоять только из цифр до 20 символов.")
+    private String phone;
 
-    @Column(name = "email", unique = true)
-    @Schema(description = "Email пользователя. Максимальная длина - 50 символов.")
-    private String email;
+    @Column(name = "firstname")
+    private String firstname;
+
+    @Column(name = "surname")
+    private String surname;
+
+    @Column(name = "lastname")
+    private String lastname;
 
     @Column(name = "password", length = 1000)
     @Schema(description = "Пароль пользователя. Должен содержать как минимум одну заглавную букву, одну строчную букву, одну цифру и быть длиной от 6 до 20 символов.")
     private String password;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "points")
+    private Integer points;
+
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles = new HashSet<>();
+    @Column(name = "role")
+    private Role role;
 
     @ElementCollection
     @CollectionTable(name = "user_themes", joinColumns = @JoinColumn(name = "user_id"))
