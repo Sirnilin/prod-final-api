@@ -30,6 +30,7 @@ public class ThemesModel {
     private String description;
 
     @Column(name = "explored")
+    @Schema(description = "Пройдена или не пройдена задача.")
     private Boolean explored;
 
     @Column(name = "author", length = 50)

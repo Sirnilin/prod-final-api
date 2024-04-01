@@ -1,9 +1,10 @@
 package com.example.prodolymp.service;
 
+import com.example.prodolymp.models.TaskModel;
 import com.example.prodolymp.models.ThemesModel;
+import com.example.prodolymp.models.UnderThemesModel;
 import com.example.prodolymp.models.UserModel;
-import com.example.prodolymp.repositories.ThemesRepositories;
-import com.example.prodolymp.repositories.UserRepositories;
+import com.example.prodolymp.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.context.Theme;
@@ -15,6 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ThemesService {
     private final ThemesRepositories themesRepositories;
+    private final UnderThemesRepositories underThemesRepositories;
+    private final TaskRepositories taskRepositories;
     private final UserRepositories userRepositories;
 
     public List<ThemesModel> getAllThemes(){
@@ -110,5 +113,75 @@ public class ThemesService {
 
     public ThemesModel getThemeById(Long id){
         return themesRepositories.findById(id).get();
+    }
+
+    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, String image){
+        ThemesModel theme = themesRepositories.findById(id).get();
+
+        if(theme == null){
+            return null;
+        }
+
+        UnderThemesModel under = new UnderThemesModel();
+
+        if(description.length() > 300){
+            return null;
+        }
+
+        if(url.length() > 1000){
+            return null;
+        }
+
+        if(title.length() > 50){
+            return null;
+        }
+
+        under.setExplored(false);
+        under.setGrade((float) 0);
+        under.setDescription(description);
+        under.setTitle(title);
+        under.setVideoUrl(url);
+        under.setImage(image);
+
+        theme.getUnderThemeIds().add(under.getId());
+
+        themesRepositories.save(theme);
+        underThemesRepositories.save(under);
+
+        return under;
+    }
+
+    public TaskModel createTask(String description, String response, String image, Long id){
+        UnderThemesModel under = underThemesRepositories.findById(id).get();
+
+        if(under == null){
+            return null;
+        }
+
+        if(description.length() > 300){
+            return null;
+        }
+
+        if(response.length() > 300){
+            return null;
+        }
+
+        if(image.length() > 1000){
+            return null;
+        }
+
+        TaskModel task = new TaskModel();
+
+        task.setImage(image);
+        task.setExplored(false);
+        task.setResponse(response);
+        task.setDescription(description);
+
+        under.getTasksIds().add(task.getId());
+
+        underThemesRepositories.save(under);
+        taskRepositories.save(task);
+
+        return task;
     }
 }
