@@ -94,15 +94,41 @@ public class ThemesService {
         return true;
     }
 
-    public Boolean completeTheme(Long id, UserModel user){
-        if(themesRepositories.findById(id).isEmpty() || !user.getThemes().contains(themesRepositories.findById(id).get())){
+    public Boolean completeTask(Long id, UserModel user){
+        TaskModel task = taskRepositories.findById(id).get();
+
+        if(taskRepositories.findById(id).isEmpty() || user.getThemes().contains(task.getUnder().getTheme())){
             return false;
         }
-        ThemesModel theme = themesRepositories.findById(id).get();
 
-        theme.setExplored(true);
-        theme.setGraduates(theme.getGraduates() + 1);
+        task.setExplored(true);
 
+        UnderThemesModel under = task.getUnder();
+        Boolean flag1 = true;
+
+        for(TaskModel tempTask : under.getTasks()){
+            if (!tempTask.getExplored()) {
+                flag1 = false;
+                break;
+            }
+        }
+
+        under.setExplored(flag1);
+
+        ThemesModel theme = under.getTheme();
+        Boolean flag2 = true;
+
+        for(UnderThemesModel tempUnder : theme.getUnder()){
+            if(!tempUnder.getExplored()){
+                flag2 = false;
+                break;
+            }
+        }
+
+        theme.setExplored(flag2);
+
+        taskRepositories.save(task);
+        underThemesRepositories.save(under);
         themesRepositories.save(theme);
         return true;
     }
