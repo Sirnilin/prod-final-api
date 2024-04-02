@@ -218,6 +218,7 @@ public class ThemesService {
         under.setTitle(title);
         under.setVideoUrl(url);
         under.setPoints(points);
+        under.setStarted(false);
 
         under.setTheme(theme);
 
@@ -247,6 +248,7 @@ public class ThemesService {
 
         TaskModel task = new TaskModel();
 
+        task.setStarted(false);
         task.setExplored(false);
         task.setResponse(response);
         task.setDescription(description);
