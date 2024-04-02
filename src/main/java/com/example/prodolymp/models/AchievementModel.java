@@ -13,11 +13,17 @@ public class AchievementModel {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "description")
     @Schema(description = "Описание достижения")
     private String description;
 
-    @Column(name = "progresss")
+    @Column(name = "is_completed")
     @Schema(description = "Прогресс выполнения достижения")
-    private Integer progress;
+    private Boolean isCompleted;
+
+    @Column(name = "image")
+    private String image;
 }

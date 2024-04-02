@@ -8,6 +8,7 @@ import org.springframework.ui.context.Theme;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -75,10 +76,9 @@ public class ThemesService {
         return theme;
     }
 
-    public List<ThemesModel> getAllUserTheme(UserModel user){
-        List<ThemesModel> result = (List<ThemesModel>) user.getThemes();
+    public Set<ThemesModel> getAllUserTheme(UserModel user){
 
-        return result;
+        return user.getThemes();
     }
 
     public Boolean subscribeToTheme(Long id, UserModel user){

@@ -19,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/themes")
@@ -138,7 +135,7 @@ public class ThemesController {
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    List<ThemesModel> themesList = themesService.getAllUserTheme(user.get());
+                    Set<ThemesModel> themesList = themesService.getAllUserTheme(user.get());
                     return ResponseEntity.status(HttpStatus.OK).body(themesList);
                 }else {
                     reason.setReason("Error when receiving the user profile");
