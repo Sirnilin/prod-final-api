@@ -337,7 +337,7 @@ public class ThemesController {
                             examples = @ExampleObject(
                                     name = "Пример запроса",
                                     value = "{\n" +
-                                            "  \"id\": \"айди темы к которой добавить\",\n" +
+                                            "  \"id\": \"айди подтемы\",\n" +
                                             "  \"response\": \"ответ на задачу\",\n" +
                                             "  \"description\": \"Описание задачи\",\n" +
                                             "}"

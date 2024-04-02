@@ -107,18 +107,13 @@ public class MeController {
             if (tokenService.validateToken(jwtToken)) {
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if (user.isPresent()) {
-                    if (user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)) {
-                        String image = imageService.saveImage(file);
-                        UserModel currentUser = userService.updateImage(image, user.get());
-                        if (currentUser != null) {
-                            return ResponseEntity.status(HttpStatus.OK).body(currentUser);
-                        }
-                        reason.setReason("Что то не там с запросом");
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
-                    } else {
-                        reason.setReason("The user is not an administrator");
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(reason);
+                    String image = imageService.saveImage(file);
+                    UserModel currentUser = userService.updateImage(image, user.get());
+                    if (currentUser != null) {
+                        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
                     }
+                    reason.setReason("Что то не там с запросом");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
                 } else {
                     reason.setReason("Error when receiving the user profile");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
