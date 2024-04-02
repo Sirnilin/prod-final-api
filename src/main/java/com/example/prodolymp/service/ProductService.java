@@ -78,4 +78,17 @@ public class ProductService {
 
         return result;
     }
+
+    public ProductModel addImage(String image, Long id){
+        if(productRepositories.findById(id).isEmpty()){
+            return null;
+        }
+
+        ProductModel product = productRepositories.findById(id).get();
+
+        product.setImage(image);
+
+        productRepositories.save(product);
+        return product;
+    }
 }

@@ -38,7 +38,7 @@ public class TaskModel {
     private String image;
 
     @ManyToOne
-    @JoinColumn(name = "under")
+    @JoinColumn(name = "under_id", nullable = false, referencedColumnName = "id")
     @JsonIgnore
     @Schema(description = "Подтема этой задачи")
     private UnderThemesModel under;

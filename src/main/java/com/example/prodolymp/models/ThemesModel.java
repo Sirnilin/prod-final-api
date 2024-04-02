@@ -38,11 +38,12 @@ public class ThemesModel {
     @Schema(description = "Поступил или не поступил")
     private Boolean started;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false, referencedColumnName = "id")
     private AuthorModel author;
 
-    @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinTable(name = "theme_under", joinColumns = @JoinColumn(name = "theme_id"), inverseJoinColumns = @JoinColumn(name = "under_id"))
     private Set<UnderThemesModel> under= new HashSet<>();
 
     @Column(name = "points")

@@ -31,8 +31,9 @@ public class AuthorModel {
     @Column(name = "description")
     @Schema(description = "Описание профиля автора")
     private String description;
-    @OneToMany(mappedBy = "author", targetEntity = ThemesModel.class,
-            cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinTable(name = "author_theme", joinColumns = @JoinColumn(name = "author_id"), inverseJoinColumns = @JoinColumn(name = "theme_id"))
     @JsonIgnore
     private Set<ThemesModel> themes = new HashSet<>();
 

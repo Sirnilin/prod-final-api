@@ -51,12 +51,13 @@ public class UnderThemesModel {
     private Integer points;
 
     @ManyToOne
-    @JoinColumn(name = "theme_id")
+    @JoinColumn(name = "theme_id", nullable = false, referencedColumnName = "id")
     @Schema(description = "Тема этой под темы")
     @JsonIgnore
     private ThemesModel theme;
 
-    @OneToMany(mappedBy = "under")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinTable(name = "under_task", joinColumns = @JoinColumn(name = "under_id"), inverseJoinColumns = @JoinColumn(name = "task_id"))
     @Schema(description = "Задачи в подтеме")
     private Set<TaskModel> tasks = new HashSet<>();
 

@@ -1,10 +1,8 @@
 package com.example.prodolymp.controllers;
 
-import com.example.prodolymp.models.ProductModel;
-import com.example.prodolymp.models.ReasonModel;
-import com.example.prodolymp.models.ThemesModel;
-import com.example.prodolymp.models.UserModel;
+import com.example.prodolymp.models.*;
 import com.example.prodolymp.models.enums.Role;
+import com.example.prodolymp.service.ImageService;
 import com.example.prodolymp.service.ProductService;
 import com.example.prodolymp.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,7 @@ import java.util.Set;
 public class ProductController {
     private final ProductService productService;
     private final TokenService tokenService;
+    private final ImageService imageService;
 
     @Operation(summary = "Получить все товары")
     @ApiResponses(value = {
@@ -174,6 +174,42 @@ public class ProductController {
                 if(user.isPresent()){
                     List<ProductModel> productModels = productService.getAllUserProduct(user.get());
                     return ResponseEntity.status(HttpStatus.OK).body(productModels);
+                }else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @Operation(summary = "Добавить фото для товара")
+    @PostMapping("addImage/{Id}")
+    public ResponseEntity<Object> addImageTask(
+            @RequestHeader("Authorization") String token,
+            @Parameter(description = "Файл изображения", required = true, schema = @Schema(type = "string", format = "binary"))
+            @RequestParam("file") MultipartFile file,
+            @Parameter(description = "ID задачи", required = true, example = "123", schema = @Schema(type = "integer"))
+            @PathVariable Long Id){
+        ReasonModel reason = new ReasonModel();
+        if(token != null && token.startsWith("Bearer ")){
+            String jwtToken = token.substring(7);
+            if(tokenService.validateToken(jwtToken)){
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if(user.isPresent()){
+                    if(user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)){
+                        String image = imageService.saveImage(file);
+                        ProductModel product = productService.addImage(image, Id);
+                        if(product != null){
+                            return ResponseEntity.status(HttpStatus.OK).body(product);
+                        }
+                        reason.setReason("Такой таски не существует");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                    }else{
+                        reason.setReason("The user is not an administrator");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(reason);
+                    }
                 }else {
                     reason.setReason("Error when receiving the user profile");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
