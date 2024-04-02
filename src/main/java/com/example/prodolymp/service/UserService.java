@@ -80,6 +80,11 @@ public class UserService {
         achievementRepositories.save(achievement1);
         achievementRepositories.save(achievement2);
         achievementRepositories.save(achievement3);
+
+        user.getAchievement().add(achievement1);
+        user.getAchievement().add(achievement2);
+        user.getAchievement().add(achievement3);
+        userRepositories.save(user);
         return 0;
     }
 
