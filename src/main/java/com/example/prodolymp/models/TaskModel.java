@@ -37,7 +37,7 @@ public class TaskModel {
     @Schema(description = "Картинка для задачки.")
     private String image;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "under_id", nullable = false, referencedColumnName = "id")
     @JsonIgnore
     @Schema(description = "Подтема этой задачи")

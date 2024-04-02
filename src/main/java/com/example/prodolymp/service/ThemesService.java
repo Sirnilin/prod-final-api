@@ -64,7 +64,7 @@ public class ThemesService {
             author = new AuthorModel();
 
             author.setUserId(user.getId());
-            author.setName(user.getFirstname());
+            author.setName(user.getFirstname() + " " + user.getSurname() + " " + user.getLastname());
             author.setDescription("");
             authorRepositories.save(author);
         }

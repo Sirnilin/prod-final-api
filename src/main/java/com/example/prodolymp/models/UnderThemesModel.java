@@ -50,7 +50,7 @@ public class UnderThemesModel {
     @Schema(description = "Кол-во баллов, начисляемое за выполенние этой задачи.")
     private Integer points;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_id", nullable = false, referencedColumnName = "id")
     @Schema(description = "Тема этой под темы")
     @JsonIgnore
@@ -60,5 +60,4 @@ public class UnderThemesModel {
     @JoinTable(name = "under_task", joinColumns = @JoinColumn(name = "under_id"), inverseJoinColumns = @JoinColumn(name = "task_id"))
     @Schema(description = "Задачи в подтеме")
     private Set<TaskModel> tasks = new HashSet<>();
-
 }
