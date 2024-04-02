@@ -9,6 +9,8 @@ import lombok.Data;
 
 
 import jakarta.persistence.*;
+import org.springframework.ui.context.Theme;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,15 +51,13 @@ public class UserModel {
     @Column(name = "role")
     private Role role;
 
-    @ElementCollection
-    @CollectionTable(name = "user_themes", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "theme_id")
-    private Set<Long> themeIds = new HashSet<>();
+    @OneToMany(mappedBy = "user", targetEntity = ThemesModel.class,
+            cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<AchievementModel> achievement = new HashSet<>();
 
-    @ElementCollection
-    @CollectionTable(name = "user_complete_themes", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "theme_id")
-    private Set<Long> completeThemeIds = new HashSet<>();
+    @OneToMany(mappedBy = "user", targetEntity = ThemesModel.class,
+            cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<ThemesModel> themes = new HashSet<>();
 
     @Schema(description = "Пароль пользователя. Должен содержать как минимум одну заглавную букву, одну строчную букву, одну цифру и быть длиной от 6 до 20 символов.")
     public String getPassword() {

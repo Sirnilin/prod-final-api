@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -37,24 +38,28 @@ public class ThemesModel {
     @Schema(description = "Поступил или не поступил")
     private Boolean started;
 
-    @Column(name = "author", length = 50)
-    @Schema(description = "Автор курса. Максимальня длина 50 символов.")
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private AuthorModel author;
+
+    @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<UnderThemesModel> under= new HashSet<>();
 
     @Column(name = "points")
-    @Schema(description = "Кол-во очков, начисляемое за курсю")
+    @Schema(description = "Кол-во очков, начисляемое за курс")
     private Integer points;
 
     @Column(name = "students")
-    @Schema(description = "Кол-во очков студентов на курсе.")
+    @Schema(description = "Кол-во студентов на курсе.")
     private Integer students;
 
-    @Column(name = "Кол-во тех кто закончил курс.")
-    @Schema(description = "Кол-во очков студентов на курсе.")
+    @Column(name = "graduates.")
+    @Schema(description = "Кол-во завершивишх курс")
     private Integer graduates;
 
-    @ElementCollection
-    @CollectionTable(name = "themes_under_themes", joinColumns = @JoinColumn(name = "themes_id"))
-    @Column(name = "under_themes_id")
-    private Set<Long> underThemeIds = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private UserModel user;
+
 }

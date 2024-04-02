@@ -46,14 +46,14 @@ public class UnderThemesModel {
     @Schema(description = "Кол-во баллов, начисляемое за выполенние этой задачи.")
     private Integer points;
 
-    @ElementCollection
-    @CollectionTable(name = "under_themes_tasks", joinColumns = @JoinColumn(name = "under_themes_id"))
-    @Column(name = "tasks_id")
-    private Set<Long> tasksIds = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "theme_id")
+    @Schema(description = "Тема этой под темы")
+    @JsonIgnore
+    private ThemesModel theme;
 
-    @ElementCollection
-    @CollectionTable(name = "under_themes_lesson", joinColumns = @JoinColumn(name = "under_themes_id"))
-    @Column(name = "lesson_id")
-    private Set<Long> lessonIds = new HashSet<>();
+    @OneToMany(mappedBy = "under")
+    @Schema(description = "Задачи в подтеме")
+    private Set<TaskModel> tasks = new HashSet<>();
 
 }

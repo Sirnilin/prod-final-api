@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.Objects;
+
 
 @Data
 @Entity
@@ -30,6 +32,12 @@ public class TaskModel {
     @Column(name = "image", length = 1000)
     @Schema(description = "Картинка для задачки.")
     private String image;
+
+    @ManyToOne
+    @JoinColumn(name = "under")
+    @JsonIgnore
+    @Schema(description = "Подтема этой задачи")
+    private UnderThemesModel under;
 
 
 }

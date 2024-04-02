@@ -80,8 +80,6 @@ public class ThemesController {
                                             "  \"title\": \"Название темы\",\n" +
                                             "  \"category\": \"Категория темы\",\n" +
                                             "  \"description\": \"Описание темы\",\n" +
-                                            "  \"author\": \"Автор темы\",\n" +
-                                            "  \"points\": \"Количество поинтовайди(число, а не строка)\"\n" +
                                             "}"
                             )
                     )
@@ -94,14 +92,13 @@ public class ThemesController {
                 if(request != null){
                     Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                     if(user.isPresent()){
-                        if(user.get().getRole() == Role.ROLE_USER){
+                        System.out.println(user.get().getRole());
+                        if(user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)){
                             String title = (String) request.get("title");
                             String category = (String) request.get("category");
                             String description = (String) request.get("description");
-                            String author = (String) request.get("author");
-                            Integer points = (Integer) request.get("points");
 
-                            ThemesModel theme = themesService.createTheme(title, category, description, author, points);
+                            ThemesModel theme = themesService.createTheme(title, category, description, user.get());
 
                             if(theme == null){
                                 reason.setReason("Bad title, category, description, author");
