@@ -51,12 +51,12 @@ public class UserModel {
     @Column(name = "role")
     private Role role;
 
-    @OneToMany(mappedBy = "user", targetEntity = ThemesModel.class,
-            cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<AchievementModel> achievement = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", targetEntity = ThemesModel.class,
-            cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinTable(name = "user_theme", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "theme_id"))
     private Set<ThemesModel> themes = new HashSet<>();
 
     @ElementCollection
@@ -88,6 +88,11 @@ public class UserModel {
     @CollectionTable(name = "user_started_task", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "task_id")
     private Set<Long> startedTaskIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_product_id", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "product_id")
+    private Set<Long> productIds = new HashSet<>();
 
     @Schema(description = "Пароль пользователя. Должен содержать как минимум одну заглавную букву, одну строчную букву, одну цифру и быть длиной от 6 до 20 символов.")
     public String getPassword() {

@@ -165,8 +165,8 @@ public class ThemesController {
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    if(themesService.subscribeToTheme(id, user.get(), value)){
-                        UserModel currentUser = user.get();
+                    UserModel currentUser = themesService.subscribeToTheme(id, user.get(), value);
+                    if(currentUser != null){
                         currentUser.setPassword(null);
                         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
                     }

@@ -24,4 +24,12 @@ public class ProductModel {
     @Column(name = "price")
     @Schema(description = "Цена товара")
     private Integer price;
+
+    @Column(name = "image")
+    @Schema(description = "Картинка товара")
+    private String image;
+
+    @Column(name = "is_bought")
+    @Schema(description = "Куплен или не куплен")
+    private Boolean isBought;
 }

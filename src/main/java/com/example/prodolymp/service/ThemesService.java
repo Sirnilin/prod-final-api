@@ -107,7 +107,6 @@ public class ThemesService {
                     task.setExplored(user.getCompleteTaskIds().contains(task.getId()));
                 }
             }
-
             result.add(theme);
         }
 
@@ -115,36 +114,36 @@ public class ThemesService {
         return result;
     }
 
-    public Boolean subscribeToTheme(Long id, UserModel user, String value){
+    public UserModel subscribeToTheme(Long id, UserModel user, String value){
         switch (value){
             case ("theme"):
                 if(themesRepositories.findById(id).isEmpty()){
-                    return false;
+                    return null;
                 }
                 user.getStartedThemeIds().add(id);
                 user.getThemes().add(themesRepositories.findById(id).get());
                 userRepositories.save(user);
-                return true;
+                return user;
             case ("undertheme"):
                 if(underThemesRepositories.findById(id).isEmpty()){
-                    return false;
+                    return user;
                 }
                 user.getStartedUnderThemeIds().add(id);
                 user.getThemes().add(underThemesRepositories.findById(id).get().getTheme());
                 userRepositories.save(user);
-                return true;
+                return user;
             case ("task"):
                 if(taskRepositories.findById(id).isEmpty()){
-                    return false;
+                    return user;
                 }
                 user.getStartedTaskIds().add(id);
                 user.getThemes().add(taskRepositories.findById(id).get().getUnder().getTheme());
 
                 userRepositories.save(user);
-                return true;
+                return user;
         }
 
-        return false;
+        return null;
     }
 
     public Boolean completeTask(Long id, UserModel user){

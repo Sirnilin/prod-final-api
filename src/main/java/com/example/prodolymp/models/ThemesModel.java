@@ -57,8 +57,8 @@ public class ThemesModel {
     @Schema(description = "Кол-во завершивишх курс")
     private Integer graduates;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
     @JsonIgnore
     private UserModel user;
 
