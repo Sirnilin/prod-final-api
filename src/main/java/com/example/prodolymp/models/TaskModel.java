@@ -29,6 +29,10 @@ public class TaskModel {
     @Schema(description = "Выполнена или не выполнена.")
     private Boolean explored;
 
+    @Column(name = "started")
+    @Schema(description = "Выполнена или не выполнена.")
+    private Boolean started;
+
     @Column(name = "image", length = 1000)
     @Schema(description = "Картинка для задачки.")
     private String image;

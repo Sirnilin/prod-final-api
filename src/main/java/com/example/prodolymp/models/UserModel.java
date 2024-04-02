@@ -59,6 +59,36 @@ public class UserModel {
             cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<ThemesModel> themes = new HashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name = "user_complete_themes", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "theme_id")
+    private Set<Long> completeThemeIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_complete_under_themes", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "under_theme_id")
+    private Set<Long> completeUnderThemeIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_complete_task", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "task_id")
+    private Set<Long> completeTaskIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_started_themes", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "theme_id")
+    private Set<Long> startedThemeIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_started_under_themes", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "under_theme_id")
+    private Set<Long> startedUnderThemeIds = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "user_started_task", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "task_id")
+    private Set<Long> startedTaskIds = new HashSet<>();
+
     @Schema(description = "Пароль пользователя. Должен содержать как минимум одну заглавную букву, одну строчную букву, одну цифру и быть длиной от 6 до 20 символов.")
     public String getPassword() {
         return password;

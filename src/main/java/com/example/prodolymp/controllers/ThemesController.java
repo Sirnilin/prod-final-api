@@ -152,10 +152,12 @@ public class ThemesController {
             @ApiResponse(responseCode = "200", description = "Пользователь успешно подписан на курс", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
             @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
-    @PostMapping("/add/{id}")
+    @PostMapping("/add/{value}/{id}")
     public ResponseEntity<Object> subscribeToTheme(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
+            @Parameter(description = "Выбор на что подписаться (theme, undertheme, task)", required = true, example = "task", schema = @Schema(type = "string"))
+            @PathVariable String value,
             @PathVariable Long id){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
@@ -163,7 +165,7 @@ public class ThemesController {
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    if(themesService.subscribeToTheme(id, user.get())){
+                    if(themesService.subscribeToTheme(id, user.get(), value)){
                         UserModel currentUser = user.get();
                         currentUser.setPassword(null);
                         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
@@ -185,19 +187,19 @@ public class ThemesController {
             @ApiResponse(responseCode = "200", description = "Пользователь успешно прошел задачу", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
             @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
             @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))    })
-    @PostMapping("/complete/{themeId}")
+    @PostMapping("/complete/{Id}")
     public ResponseEntity<Object> completeTheme(
             @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
             @RequestHeader("Authorization") String token,
-            @Parameter(description = "Айди задачи, которую он прошел", required = true, example = "43", schema = @Schema(type = "43"))
-            @PathVariable Long themeId){
+            @Parameter(description = "Айди задачи, которую он прошел", required = true, example = "43", schema = @Schema(type = "integer"))
+            @PathVariable Long Id){
         ReasonModel reason = new ReasonModel();
         if(token != null && token.startsWith("Bearer ")){
             String jwtToken = token.substring(7);
             if(tokenService.validateToken(jwtToken)){
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if(user.isPresent()){
-                    if(themesService.completeTask(themeId, user.get())){
+                    if(themesService.completeTask(Id, user.get())){
                         UserModel currentUser = user.get();
                         currentUser.setPassword(null);
                         return ResponseEntity.status(HttpStatus.OK).body(currentUser);

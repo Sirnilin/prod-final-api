@@ -34,6 +34,10 @@ public class UnderThemesModel {
     @Schema(description = "Пройдена или не пройдена подзадача.")
     private Boolean explored;
 
+    @Column(name = "started")
+    @Schema(description = "Подтема начата.")
+    private Boolean started;
+
     @Column(name = "image", length = 1000)
     @Schema(description = "Ссылка на картинку для подзадачи.")
     private String image;
