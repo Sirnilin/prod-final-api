@@ -21,6 +21,10 @@ public class ProductModel {
     @Schema(description = "Описание товара")
     private String description;
 
+    @Column(name = "category")
+    @Schema(description = "Категория")
+    private String category;
+
     @Column(name = "price")
     @Schema(description = "Цена товара")
     private Integer price;
