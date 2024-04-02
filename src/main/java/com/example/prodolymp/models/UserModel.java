@@ -9,6 +9,7 @@ import lombok.Data;
 
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import org.springframework.ui.context.Theme;
 
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "users")
+@EqualsAndHashCode(of = "id")
 public class UserModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

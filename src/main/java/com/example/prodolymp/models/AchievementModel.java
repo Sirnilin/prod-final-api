@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
 @Table(name = "achievement")
+@EqualsAndHashCode(of = "id")
 public class AchievementModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

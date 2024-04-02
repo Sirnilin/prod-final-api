@@ -1,6 +1,7 @@
 package com.example.prodolymp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "author_model")
 @EqualsAndHashCode(of = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class AuthorModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +34,7 @@ public class AuthorModel {
     @Schema(description = "Описание профиля автора")
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinTable(name = "author_theme", joinColumns = @JoinColumn(name = "author_id"), inverseJoinColumns = @JoinColumn(name = "theme_id"))
     @JsonIgnore
     private Set<ThemesModel> themes = new HashSet<>();

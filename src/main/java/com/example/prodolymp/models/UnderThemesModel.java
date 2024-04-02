@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,19 +12,19 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "under_themes")
+@EqualsAndHashCode(of = "id")
 public class UnderThemesModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonIgnore
     private Long id;
 
     @Column(name = "title", length = 50)
     @Schema(description = "Заголовок подзадачи для курса. Максимальная длина - 50 символолв.")
     private String title;
 
-    @Column(name = "discription", length = 300)
-    @Schema(description = "Описание подзадачи. Максимальная длина - 300 символов.")
+    @Column(name = "discription", length = 1000)
+    @Schema(description = "Описание подзадачи. Максимальная длина - 1000 символов.")
     private String description;
 
     @Column(name = "video_url", length = 1000)
