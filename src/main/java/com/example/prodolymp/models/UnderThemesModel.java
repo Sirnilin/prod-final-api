@@ -50,6 +50,14 @@ public class UnderThemesModel {
     @Schema(description = "Кол-во баллов, начисляемое за выполенние этой задачи.")
     private Integer points;
 
+    @Column(name = "count_grade")
+    @JsonIgnore
+    private Integer countGrade;
+
+    @Column(name = "sum_grade")
+    @JsonIgnore
+    private Integer sumGrade;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_id", nullable = false, referencedColumnName = "id")
     @Schema(description = "Тема этой под темы")

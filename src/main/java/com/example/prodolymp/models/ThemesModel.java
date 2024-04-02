@@ -58,6 +58,10 @@ public class ThemesModel {
     @Schema(description = "Кол-во завершивишх курс")
     private Integer graduates;
 
+    @Column(name = "grade")
+    @Schema(description = "Оценка пользователей этой задачи")
+    private Float grade;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
     @JsonIgnore

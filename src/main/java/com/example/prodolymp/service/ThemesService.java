@@ -287,5 +287,42 @@ public class ThemesService {
 
         return task;
     }
+
+    public UnderThemesModel addGrade(Integer grade, Long id){
+        if(underThemesRepositories.findById(id).isEmpty()){
+            return null;
+        }
+
+        UnderThemesModel under = underThemesRepositories.findById(id).get();
+
+        int countGrade = under.getCountGrade() != null ? under.getCountGrade() + 1 : 1;
+        int sumGrade = under.getSumGrade() != null ? under.getSumGrade() + grade : grade;
+
+        under.setGrade((float) (sumGrade/countGrade));
+
+        underThemesRepositories.save(under);
+        setThemeGrade(under.getTheme());
+        return under;
+    }
+
+    private void setThemeGrade(ThemesModel theme){
+        int countGrade = 0;
+        int sumGrade = 0;
+
+        for(UnderThemesModel under : theme.getUnder()){
+            if(under.getGrade() != null && under.getGrade() > 0){
+                countGrade++;
+                sumGrade += under.getGrade();
+            }
+        }
+
+        if(countGrade == 0){
+            theme.setGrade((float) 0);
+        }else{
+            theme.setGrade((float) (sumGrade/countGrade));
+        }
+
+        themesRepositories.save(theme);
+    }
 }
 
