@@ -122,7 +122,7 @@ public class ThemesService {
                     return false;
                 }
                 user.getStartedThemeIds().add(id);
-
+                user.getThemes().add(themesRepositories.findById(id).get());
                 userRepositories.save(user);
                 return true;
             case ("undertheme"):
@@ -130,7 +130,7 @@ public class ThemesService {
                     return false;
                 }
                 user.getStartedUnderThemeIds().add(id);
-
+                user.getThemes().add(underThemesRepositories.findById(id).get().getTheme());
                 userRepositories.save(user);
                 return true;
             case ("task"):
@@ -138,6 +138,7 @@ public class ThemesService {
                     return false;
                 }
                 user.getStartedTaskIds().add(id);
+                user.getThemes().add(taskRepositories.findById(id).get().getUnder().getTheme());
 
                 userRepositories.save(user);
                 return true;
