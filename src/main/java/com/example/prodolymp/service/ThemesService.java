@@ -19,21 +19,22 @@ public class ThemesService {
     private final TaskRepositories taskRepositories;
     private final UserRepositories userRepositories;
     private final AuthorRepositories authorRepositories;
+    private final AchievementRepositories achievementRepositories;
 
-    public List<ThemesModel> getAllThemes(UserModel user){
+    public List<ThemesModel> getAllThemes(UserModel user) {
         List<ThemesModel> themesModelList = themesRepositories.findAll();
 
         List<ThemesModel> result = new ArrayList<>();
 
-        for(ThemesModel theme : themesModelList){
+        for (ThemesModel theme : themesModelList) {
             theme.setStarted(user.getStartedThemeIds().contains(theme.getId()));
             theme.setExplored(user.getCompleteThemeIds().contains(theme.getId()));
 
-            for(UnderThemesModel under : theme.getUnder()){
+            for (UnderThemesModel under : theme.getUnder()) {
                 under.setStarted(user.getStartedUnderThemeIds().contains(under.getId()));
                 under.setExplored(user.getCompleteUnderThemeIds().contains(under.getId()));
 
-                for (TaskModel task : under.getTasks()){
+                for (TaskModel task : under.getTasks()) {
                     task.setStarted(user.getStartedTaskIds().contains(task.getId()));
                     task.setExplored(user.getCompleteTaskIds().contains(task.getId()));
                 }
@@ -46,21 +47,21 @@ public class ThemesService {
         return result;
     }
 
-    public ThemesModel createTheme(String title, String category, String description, UserModel user){
-        if(title.length() > 50){
+    public ThemesModel createTheme(String title, String category, String description, UserModel user) {
+        if (title.length() > 50) {
             return null;
         }
 
-        if(category.length() > 50){
+        if (category.length() > 50) {
             return null;
         }
 
-        if(description.length() > 300){
+        if (description.length() > 300) {
             return null;
         }
         AuthorModel author = authorRepositories.findByUserId(user.getId());
 
-        if(author == null){
+        if (author == null) {
             author = new AuthorModel();
 
             author.setUserId(user.getId());
@@ -89,20 +90,20 @@ public class ThemesService {
         return theme;
     }
 
-    public Set<ThemesModel> getAllUserTheme(UserModel user){
+    public Set<ThemesModel> getAllUserTheme(UserModel user) {
         Set<ThemesModel> themesModelList = user.getThemes();
 
         Set<ThemesModel> result = new HashSet<>();
 
-        for(ThemesModel theme : themesModelList){
+        for (ThemesModel theme : themesModelList) {
             theme.setStarted(user.getStartedThemeIds().contains(theme.getId()));
             theme.setExplored(user.getCompleteThemeIds().contains(theme.getId()));
 
-            for(UnderThemesModel under : theme.getUnder()){
+            for (UnderThemesModel under : theme.getUnder()) {
                 under.setStarted(user.getStartedUnderThemeIds().contains(under.getId()));
                 under.setExplored(user.getCompleteUnderThemeIds().contains(under.getId()));
 
-                for (TaskModel task : under.getTasks()){
+                for (TaskModel task : under.getTasks()) {
                     task.setStarted(user.getStartedTaskIds().contains(task.getId()));
                     task.setExplored(user.getCompleteTaskIds().contains(task.getId()));
                 }
@@ -114,10 +115,10 @@ public class ThemesService {
         return result;
     }
 
-    public UserModel subscribeToTheme(Long id, UserModel user, String value){
-        switch (value){
+    public UserModel subscribeToTheme(Long id, UserModel user, String value) {
+        switch (value) {
             case ("theme"):
-                if(themesRepositories.findById(id).isEmpty()){
+                if (themesRepositories.findById(id).isEmpty()) {
                     return null;
                 }
                 user.getStartedThemeIds().add(id);
@@ -125,7 +126,7 @@ public class ThemesService {
                 userRepositories.save(user);
                 return user;
             case ("undertheme"):
-                if(underThemesRepositories.findById(id).isEmpty()){
+                if (underThemesRepositories.findById(id).isEmpty()) {
                     return user;
                 }
                 user.getStartedUnderThemeIds().add(id);
@@ -133,7 +134,7 @@ public class ThemesService {
                 userRepositories.save(user);
                 return user;
             case ("task"):
-                if(taskRepositories.findById(id).isEmpty()){
+                if (taskRepositories.findById(id).isEmpty()) {
                     return user;
                 }
                 user.getStartedTaskIds().add(id);
@@ -146,10 +147,10 @@ public class ThemesService {
         return null;
     }
 
-    public Boolean completeTask(Long id, UserModel user){
+    public Boolean completeTask(Long id, UserModel user) {
         TaskModel task = taskRepositories.findById(id).get();
 
-        if(taskRepositories.findById(id).isEmpty() || user.getThemes().contains(task.getUnder().getTheme())){
+        if (taskRepositories.findById(id).isEmpty() || user.getThemes().contains(task.getUnder().getTheme())) {
             return false;
         }
 
@@ -158,57 +159,63 @@ public class ThemesService {
         UnderThemesModel under = task.getUnder();
         Boolean flag1 = true;
 
-        for(TaskModel tempTask : under.getTasks()){
+        for (TaskModel tempTask : under.getTasks()) {
             if (!user.getCompleteTaskIds().contains(tempTask.getId())) {
                 flag1 = false;
                 break;
             }
         }
 
-        if(flag1){
+        if (flag1) {
             user.getCompleteUnderThemeIds().add(under.getId());
+            user.setPoints(user.getPoints() + under.getPoints());
         }
 
         ThemesModel theme = under.getTheme();
         Boolean flag2 = true;
 
-        for(UnderThemesModel tempUnder : theme.getUnder()){
-            if(!user.getCompleteUnderThemeIds().contains(tempUnder.getId())){
+        for (UnderThemesModel tempUnder : theme.getUnder()) {
+            if (!user.getCompleteUnderThemeIds().contains(tempUnder.getId())) {
                 flag2 = false;
                 break;
             }
         }
 
-       if(flag2){
-           user.getCompleteThemeIds().add(theme.getId());
-       }
+        if (flag2) {
+            user.getCompleteThemeIds().add(theme.getId());
+            for (AchievementModel achievement : user.getAchievement()) {
+                if (achievement.getName().equals("Образовака")) {
+                    achievement.setIsCompleted(true);
+                    achievementRepositories.save(achievement);
+                    break;
+                }
+            }
+        }
 
         userRepositories.save(user);
         return true;
     }
 
-    public ThemesModel getThemeById(Long id){
+    public ThemesModel getThemeById(Long id) {
         return themesRepositories.findById(id).get();
     }
 
-    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, Integer points){
-        ThemesModel theme = themesRepositories.findById(id).get();
-
-        if(theme == null){
+    public UnderThemesModel createUnderThemes(Long id, String title, String description, String url, Integer points) {
+        if (themesRepositories.findById(id).isEmpty()) {
             return null;
         }
-
+        ThemesModel theme = themesRepositories.findById(id).get();
         UnderThemesModel under = new UnderThemesModel();
 
-        if(description.length() > 300){
+        if (description.length() > 300) {
             return null;
         }
 
-        if(url.length() > 1000){
+        if (url.length() > 1000) {
             return null;
         }
 
-        if(title.length() > 50){
+        if (title.length() > 50) {
             return null;
         }
 
@@ -231,21 +238,21 @@ public class ThemesService {
         return under;
     }
 
-    public TaskModel createTask(String description, String response, Long id){
+    public TaskModel createTask(String description, String response, Long id) {
+
+
+        if (underThemesRepositories.findById(id).isEmpty()) {
+            return null;
+        }
+
+        if (description.length() > 300) {
+            return null;
+        }
+
+        if (response.length() > 300) {
+            return null;
+        }
         UnderThemesModel under = underThemesRepositories.findById(id).get();
-
-        if(under == null){
-            return null;
-        }
-
-        if(description.length() > 300){
-            return null;
-        }
-
-        if(response.length() > 300){
-            return null;
-        }
-
         TaskModel task = new TaskModel();
 
         task.setStarted(false);
@@ -262,13 +269,11 @@ public class ThemesService {
         return task;
     }
 
-    public UnderThemesModel addImageUnderTheme(String image, Long id){
-        UnderThemesModel under = underThemesRepositories.findById(id).get();
-
-        if(under == null){
-            return under;
+    public UnderThemesModel addImageUnderTheme(String image, Long id) {
+        if (underThemesRepositories.findById(id).isEmpty()) {
+            return null;
         }
-
+        UnderThemesModel under = underThemesRepositories.findById(id).get();
         under.setImage(image);
 
         underThemesRepositories.save(under);
@@ -277,19 +282,18 @@ public class ThemesService {
     }
 
     public TaskModel addImageTask(String image, Long id) {
-        TaskModel task = taskRepositories.findById(id).get();
-
-        if (task == null) {
-            return task;
+        if (taskRepositories.findById(id).isEmpty()) {
+            return null;
         }
-
+        TaskModel task = taskRepositories.findById(id).get();
         task.setImage(image);
 
+        taskRepositories.save(task);
         return task;
     }
 
-    public UnderThemesModel addGrade(Integer grade, Long id){
-        if(underThemesRepositories.findById(id).isEmpty()){
+    public UnderThemesModel addGrade(Integer grade, Long id) {
+        if (underThemesRepositories.findById(id).isEmpty()) {
             return null;
         }
 
@@ -298,28 +302,28 @@ public class ThemesService {
         int countGrade = under.getCountGrade() != null ? under.getCountGrade() + 1 : 1;
         int sumGrade = under.getSumGrade() != null ? under.getSumGrade() + grade : grade;
 
-        under.setGrade((float) (sumGrade/countGrade));
+        under.setGrade((float) (sumGrade / countGrade));
 
         underThemesRepositories.save(under);
         setThemeGrade(under.getTheme());
         return under;
     }
 
-    private void setThemeGrade(ThemesModel theme){
+    private void setThemeGrade(ThemesModel theme) {
         int countGrade = 0;
         int sumGrade = 0;
 
-        for(UnderThemesModel under : theme.getUnder()){
-            if(under.getGrade() != null && under.getGrade() > 0){
+        for (UnderThemesModel under : theme.getUnder()) {
+            if (under.getGrade() != null && under.getGrade() > 0) {
                 countGrade++;
                 sumGrade += under.getGrade();
             }
         }
 
-        if(countGrade == 0){
+        if (countGrade == 0) {
             theme.setGrade((float) 0);
-        }else{
-            theme.setGrade((float) (sumGrade/countGrade));
+        } else {
+            theme.setGrade((float) (sumGrade / countGrade));
         }
 
         themesRepositories.save(theme);

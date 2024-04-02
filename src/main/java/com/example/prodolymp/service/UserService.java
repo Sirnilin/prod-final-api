@@ -1,8 +1,10 @@
 package com.example.prodolymp.service;
 
+import com.example.prodolymp.models.AchievementModel;
 import com.example.prodolymp.models.UnderThemesModel;
 import com.example.prodolymp.models.UserModel;
 import com.example.prodolymp.models.enums.Role;
+import com.example.prodolymp.repositories.AchievementRepositories;
 import com.example.prodolymp.repositories.UserRepositories;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepositories userRepositories;
+    private final AchievementRepositories achievementRepositories;
 
     public int createUser(String phone, String password, String firstname, String surname, String lastname, Boolean admin){
         if(phone == null || password == null || firstname == null){
@@ -52,6 +55,31 @@ public class UserService {
         }
         userRepositories.save(user);
 
+        AchievementModel achievement1 = new AchievementModel();
+        AchievementModel achievement2 = new AchievementModel();
+        AchievementModel achievement3 = new AchievementModel();
+
+        achievement1.setUser(user);
+        achievement1.setName("По люБВИ");
+        achievement1.setDescription("Взять ВсОШ");
+        achievement1.setIsCompleted(false);
+        achievement1.setImage("http://82.97.241.151:8081/images/Patent.svg");
+
+        achievement2.setUser(user);
+        achievement2.setName("Образовака");
+        achievement2.setDescription("Завершить курс");
+        achievement2.setIsCompleted(false);
+        achievement2.setImage("http://82.97.241.151:8081/images/Medal.svg");
+
+        achievement3.setUser(user);
+        achievement3.setName("Первый");
+        achievement3.setDescription("Зарегестрируйся");
+        achievement3.setIsCompleted(true);
+        achievement3.setImage("http://82.97.241.151:8081/images/Square_academic_cap.svg");
+
+        achievementRepositories.save(achievement1);
+        achievementRepositories.save(achievement2);
+        achievementRepositories.save(achievement3);
         return 0;
     }
 
@@ -92,6 +120,14 @@ public class UserService {
         }
 
         userRepositories.save(user);
+        return user;
+    }
+
+    public UserModel updateImage(String image, UserModel user){
+        user.setImage(image);
+
+        userRepositories.save(user);
+
         return user;
     }
 }
