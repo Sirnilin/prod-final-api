@@ -2,7 +2,6 @@ package com.example.prodolymp.controllers;
 
 import com.example.prodolymp.models.*;
 import com.example.prodolymp.models.enums.Role;
-import com.example.prodolymp.repositories.ThemesRepositories;
 import com.example.prodolymp.service.ImageService;
 import com.example.prodolymp.service.ThemesService;
 import com.example.prodolymp.service.TokenService;
@@ -474,17 +473,45 @@ public class ThemesController {
             if (tokenService.validateToken(jwtToken)) {
                 Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
                 if (user.isPresent()) {
-                    if (user.get().getRole() != null && user.get().getRole().equals(Role.ROLE_ADMIN)) {
-                        UnderThemesModel under = themesService.addGrade(grade, underThemeId);
-                        if (under != null) {
-                            return ResponseEntity.status(HttpStatus.OK).body(under);
-                        }
-                        reason.setReason("Такой подкатегории не существует");
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
-                    } else {
-                        reason.setReason("The user is not an administrator");
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(reason);
+                    UnderThemesModel under = themesService.addGrade(grade, underThemeId);
+                    if (under != null) {
+                        return ResponseEntity.status(HttpStatus.OK).body(under);
                     }
+                    reason.setReason("Такой подкатегории не существует");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                } else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
+
+    @Operation(summary = "Получить все таски по айди подтемы")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пост получен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))})
+    @GetMapping("/getAllTask/{id}")
+    public ResponseEntity<Object> getAllTheme(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
+            @RequestHeader("Authorization") String token,
+            @Parameter(description = "Айди подтемы, таски которой нужно получить", required = true, example = "43", schema = @Schema(type = "integer"))
+            @PathVariable Long id) {
+        ReasonModel reason = new ReasonModel();
+        if (token != null && token.startsWith("Bearer ")) {
+            String jwtToken = token.substring(7);
+            if (tokenService.validateToken(jwtToken)) {
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if (user.isPresent()) {
+                    List<TaskModel> taskModels = themesService.getAllUnderTaskId(id, user.get());
+                    if (taskModels != null) {
+                        return ResponseEntity.status(HttpStatus.OK).body(taskModels);
+                    }
+                    reason.setReason("Курс с таким айди не существует");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
                 } else {
                     reason.setReason("Error when receiving the user profile");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);

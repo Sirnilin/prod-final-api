@@ -232,6 +232,7 @@ public class ThemesService {
         underThemesRepositories.save(under);
 
         theme.getUnder().add(under);
+
         theme.setPoints(theme.getPoints() + points);
         themesRepositories.save(theme);
 
@@ -327,6 +328,26 @@ public class ThemesService {
         }
 
         themesRepositories.save(theme);
+    }
+
+    public List<TaskModel> getAllUnderTaskId(Long id, UserModel user){
+        if(underThemesRepositories.findById(id).isEmpty()){
+            return null;
+        }
+
+        UnderThemesModel under = underThemesRepositories.findById(id).get();
+
+        Set<TaskModel> taskModels = under.getTasks();
+        List<TaskModel> result = new ArrayList<>();
+
+        for(TaskModel task : taskModels){
+            task.setExplored(user.getCompleteTaskIds().contains(id));
+            task.setStarted(user.getStartedTaskIds().contains(id));
+
+            result.add(task);
+        }
+
+        return result;
     }
 }
 
