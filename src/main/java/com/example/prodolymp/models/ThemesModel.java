@@ -67,7 +67,6 @@ public class ThemesModel {
     private Float grade;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
     @JsonIgnore
     private UserModel user;
 
