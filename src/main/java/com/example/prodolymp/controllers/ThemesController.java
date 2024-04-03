@@ -521,4 +521,37 @@ public class ThemesController {
         reason.setReason("Invalid token");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
     }
+
+    @Operation(summary = "Получить подтему по айди")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пост получен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThemesModel.class))),
+            @ApiResponse(responseCode = "400", description = "Неверный входные данные", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный токен", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReasonModel.class)))})
+    @GetMapping("/getByUnderTheme/{id}")
+    public ResponseEntity<Object> getUnderThemeById(
+            @Parameter(description = "Bearer токен авторизации", required = true, example = "Bearer <ваш_токен>", schema = @Schema(type = "string"))
+            @RequestHeader("Authorization") String token,
+            @Parameter(description = "Айди темы, которую нужно получить", required = true, example = "43", schema = @Schema(type = "integer"))
+            @PathVariable Long id) {
+        ReasonModel reason = new ReasonModel();
+        if (token != null && token.startsWith("Bearer ")) {
+            String jwtToken = token.substring(7);
+            if (tokenService.validateToken(jwtToken)) {
+                Optional<UserModel> user = tokenService.getUserByToken(jwtToken);
+                if (user.isPresent()) {
+                    UnderThemesModel under = themesService.getUnderTheme(id, user.get());
+                    if (under!= null) {
+                        return ResponseEntity.status(HttpStatus.OK).body(under);
+                    }
+                    reason.setReason("Курс с таким айди не существует");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reason);
+                } else {
+                    reason.setReason("Error when receiving the user profile");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+                }
+            }
+        }
+        reason.setReason("Invalid token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(reason);
+    }
 }

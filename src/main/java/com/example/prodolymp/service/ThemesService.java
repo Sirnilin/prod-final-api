@@ -349,5 +349,18 @@ public class ThemesService {
 
         return result;
     }
+
+    public UnderThemesModel getUnderTheme(Long id, UserModel user){
+        if(underThemesRepositories.findById(id).isEmpty()){
+            return null;
+        }
+
+        UnderThemesModel under = underThemesRepositories.findById(id).get();
+
+        under.setExplored(user.getCompleteUnderThemeIds().contains(id));
+        under.setStarted(user.getStartedUnderThemeIds().contains(id));
+
+        return under;
+    }
 }
 
